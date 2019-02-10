@@ -31,6 +31,13 @@ public class JobController {
         jobService.addCronJob(jobName,jobGroup);
         return "create cron task success";
     }
+    
+    @RequestMapping(value = "/query",method = RequestMethod.GET)
+    public String queryJob(
+    		/*@RequestParam("jobName") String jobName, @RequestParam("jobGroup") String jobGroup*/){
+        jobService.queryJob("","");
+        return "create cron task success";
+    }
 
     /**
      * 创建异步任务

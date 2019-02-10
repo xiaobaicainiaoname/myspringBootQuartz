@@ -40,5 +40,7 @@ public interface JobService {
      */
     void deleteJob(String jobName, String jobGroup);
 
+	void queryJob(String jobName, String jobGroup);
+
 
 }

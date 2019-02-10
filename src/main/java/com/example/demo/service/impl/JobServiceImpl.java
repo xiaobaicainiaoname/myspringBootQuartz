@@ -14,11 +14,16 @@ import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
 
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author hzb
@@ -43,19 +48,44 @@ public class JobServiceImpl implements JobService {
             JobKey jobKey = JobKey.jobKey(jobName, jobGroup);
             JobDetail jobDetail = scheduler.getJobDetail(jobKey);
             if (jobDetail != null) {
-                System.out.println("job:" + jobName + " 已存在");
+                System.out.println("job:" + jobName + " 已存在  用来修改");
+                JobDetail jobDetail2 = jobDetail.getJobBuilder().withDescription("修改").build();
+                
+                JobDataMap jobDataMap = jobDetail.getJobDataMap();
+                jobDataMap.put("taskData", "啊啊");
+                
+               
+//                TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroup);
+                TriggerKey triggerKey = TriggerKey.triggerKey(jobName + "_trigger", jobGroup + "_trigger");
+    			// 表达式调度构建器
+    			CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule("*/2 * * * * ?");
+
+    			CronTrigger trigger = (CronTrigger) scheduler.getTrigger(triggerKey);
+
+    			// 按新的cronExpression表达式重新构建trigger
+    			trigger = trigger.getTriggerBuilder().withIdentity(triggerKey).withSchedule(scheduleBuilder).build();
+
+    			// 按新的trigger重新设置job执行
+//    			scheduler.rescheduleJob(triggerKey, trigger);
+    			
+    			 scheduler.deleteJob(jobKey);
+    			scheduler.scheduleJob(jobDetail2, trigger);
+    			
             } else {
                 //构建job信息
-                jobDetail = JobBuilder.newJob(CronJob.class).withIdentity(jobName, jobGroup).build();
+                jobDetail = JobBuilder.newJob(CronJob.class).withIdentity(jobName, jobGroup)
+                		.withDescription("jobDetail+job功能描述").build();
                 //用JopDataMap来传递数据
-                jobDetail.getJobDataMap().put("taskData", "hzb-cron-001");
+                JobDataMap jobDataMap = jobDetail.getJobDataMap();
+                jobDataMap.put("taskData", "hzb-cron-001");
+                jobDataMap.put("url", "https://blog.csdn.net/xiaohuaidan007/article/details/77485673?utm_source=blogxgwz0");
 
                 //表达式调度构建器(即任务执行的时间,每5秒执行一次)
                 CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule("*/5 * * * * ?");
 
                 //按新的cronExpression表达式构建一个新的trigger
                 CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity(jobName + "_trigger", jobGroup + "_trigger")
-                        .withSchedule(scheduleBuilder).build();
+                        .withSchedule(scheduleBuilder).withDescription("trigger+描述").build();
                 scheduler.scheduleJob(jobDetail, trigger);
             }
         } catch (Exception e) {
@@ -63,6 +93,38 @@ public class JobServiceImpl implements JobService {
         }
     }
 
+    /**
+     * 直接查表写sql
+     */
+    @Override
+	public void queryJob(String jobName1, String jobGroup1) {
+    	HashMap<Object, Object> hashMap = new HashMap<>();
+    	try {
+    		Scheduler scheduler = schedulerFactoryBean.getScheduler();
+//        	schedulerFactoryBean.
+             for (String groupName : scheduler.getJobGroupNames()) {
+                 for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
+                     String jobName = jobKey.getName();
+                     String jobGroup = jobKey.getGroup();
+                     //get job's trigger
+//                     List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
+//                     Date nextFireTime = triggers.get(0).getNextFireTime();
+//                     System.out.println("[jobName] : " + jobName + " [groupName] : "
+//                         + jobGroup + " - " + nextFireTime);
+                     JobDetail jobDetail = scheduler.getJobDetail(jobKey);
+                     String description = jobDetail.getDescription();
+                     JobDataMap jobDataMap = jobDetail.getJobDataMap();
+//                     jobDetail.
+                     List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
+//                     triggers.get(0).getStartTime()
+                 }
+             }
+		} catch (SchedulerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+	}
     @Override
     public void addAsyncJob(String jobName, String jobGroup) {
         try {
@@ -132,4 +194,6 @@ public class JobServiceImpl implements JobService {
         }
 
     }
+
+	
 }
