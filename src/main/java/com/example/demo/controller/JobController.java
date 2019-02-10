@@ -1,5 +1,7 @@
 package com.example.demo.controller;
 
+import java.util.List;
+
 //import com.springquartz.service.JobService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -7,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.entity.JobAndTrigger;
 import com.example.demo.service.JobService;
 
 /**
@@ -33,10 +36,11 @@ public class JobController {
     }
     
     @RequestMapping(value = "/query",method = RequestMethod.GET)
-    public String queryJob(
-    		/*@RequestParam("jobName") String jobName, @RequestParam("jobGroup") String jobGroup*/){
-        jobService.queryJob("","");
-        return "create cron task success";
+    public List<JobAndTrigger> queryJob(
+    		 @RequestParam(defaultValue="1",required=false) Integer pageNum,
+    		 @RequestParam(defaultValue="1",required=false) Integer pageSize){
+        List<JobAndTrigger> result=jobService.queryJob(pageNum,pageNum);
+        return result;
     }
 
     /**

@@ -1,7 +1,9 @@
 package com.example.demo.service.impl;
 
+import com.example.demo.entity.JobAndTrigger;
 import com.example.demo.job.AsyncJob;
 import com.example.demo.job.CronJob;
+import com.example.demo.mapper.JobAndTriggerMapper;
 import com.example.demo.service.JobService;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.CronTrigger;
@@ -67,12 +69,15 @@ public class JobServiceImpl implements JobService {
 
     			// 按新的trigger重新设置job执行
 //    			scheduler.rescheduleJob(triggerKey, trigger);
-    			
+    			System.err.println(new Date().getTime());
     			 scheduler.deleteJob(jobKey);
     			scheduler.scheduleJob(jobDetail2, trigger);
     			
             } else {
                 //构建job信息
+            	//1549792055441
+            	//1549792055000
+            	//1549792055000
                 jobDetail = JobBuilder.newJob(CronJob.class).withIdentity(jobName, jobGroup)
                 		.withDescription("jobDetail+job功能描述").build();
                 //用JopDataMap来传递数据
@@ -86,6 +91,7 @@ public class JobServiceImpl implements JobService {
                 //按新的cronExpression表达式构建一个新的trigger
                 CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity(jobName + "_trigger", jobGroup + "_trigger")
                         .withSchedule(scheduleBuilder).withDescription("trigger+描述").build();
+                System.err.println(new Date().getTime());
                 scheduler.scheduleJob(jobDetail, trigger);
             }
         } catch (Exception e) {
@@ -95,34 +101,13 @@ public class JobServiceImpl implements JobService {
 
     /**
      * 直接查表写sql
-     */
+     */;
+    @Autowired
+    public JobAndTriggerMapper jobAndTriggerMapper;
     @Override
-	public void queryJob(String jobName1, String jobGroup1) {
-    	HashMap<Object, Object> hashMap = new HashMap<>();
-    	try {
-    		Scheduler scheduler = schedulerFactoryBean.getScheduler();
-//        	schedulerFactoryBean.
-             for (String groupName : scheduler.getJobGroupNames()) {
-                 for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
-                     String jobName = jobKey.getName();
-                     String jobGroup = jobKey.getGroup();
-                     //get job's trigger
-//                     List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
-//                     Date nextFireTime = triggers.get(0).getNextFireTime();
-//                     System.out.println("[jobName] : " + jobName + " [groupName] : "
-//                         + jobGroup + " - " + nextFireTime);
-                     JobDetail jobDetail = scheduler.getJobDetail(jobKey);
-                     String description = jobDetail.getDescription();
-                     JobDataMap jobDataMap = jobDetail.getJobDataMap();
-//                     jobDetail.
-                     List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
-//                     triggers.get(0).getStartTime()
-                 }
-             }
-		} catch (SchedulerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public List<JobAndTrigger> queryJob(Integer pageNum, Integer pageNum2) {
+    	List<JobAndTrigger> details = jobAndTriggerMapper.getJobAndTriggerDetails();
+		return details;
     	
 	}
     @Override

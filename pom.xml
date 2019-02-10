@@ -66,9 +66,14 @@
 			<scope>test</scope>
 		</dependency>
 		
+		<dependency>
+	    	<groupId>com.github.pagehelper</groupId>
+	   	 	<artifactId>pagehelper</artifactId>
+	    	<version>5.0.0</version>
+		</dependency>
 		
 		<!-- swagger -->
-		<!-- <dependency>
+		<dependency>
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-swagger2</artifactId>
 			<version>2.9.2</version>
@@ -77,7 +82,12 @@
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-swagger-ui</artifactId>
 			<version>2.9.2</version>
-		</dependency> -->
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+			<optional>true</optional>
+		</dependency>
 	</dependencies>
 
 	<build>

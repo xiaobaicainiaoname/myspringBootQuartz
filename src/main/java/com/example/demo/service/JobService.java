@@ -1,5 +1,9 @@
 package com.example.demo.service;
 
+import java.util.List;
+
+import com.example.demo.entity.JobAndTrigger;
+
 /**
  * @author hzb
  * @date 2018/08/28
@@ -40,7 +44,8 @@ public interface JobService {
      */
     void deleteJob(String jobName, String jobGroup);
 
-	void queryJob(String jobName, String jobGroup);
+	List<JobAndTrigger> queryJob(Integer pageNum, Integer pageNum2);
+
 
 
 }
